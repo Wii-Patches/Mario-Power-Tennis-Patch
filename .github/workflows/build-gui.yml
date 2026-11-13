@@ -99,7 +99,7 @@ jobs:
             $BINS --distpath pyinst_dist tools/gui.py
           cp wit-gpl-2.0.txt "pyinst_dist/MarioPowerTennis-Patcher.app/Contents/Resources/wit-gpl-2.0.txt"
           cd pyinst_dist
-          zip -qr "../Mario-Power-Tennis-Patch-${{ matrix.target }}.zip" MarioPowerTennis-Patcher.app
+          zip -qr "../Mario-Power-Tennis-ISO-Patcher-${{ matrix.target }}.zip" MarioPowerTennis-Patcher.app
 
       - name: Build app (Linux)
         if: matrix.target == 'linux-x86_64'
@@ -112,7 +112,7 @@ jobs:
             $BINS --distpath pyinst_dist tools/gui.py
           cp wit-gpl-2.0.txt pyinst_dist/MarioPowerTennis-Patcher/
           cd pyinst_dist
-          tar -czf "../Mario-Power-Tennis-Patch-${{ matrix.target }}.tar.gz" MarioPowerTennis-Patcher
+          tar -czf "../Mario-Power-Tennis-ISO-Patcher-${{ matrix.target }}.tar.gz" MarioPowerTennis-Patcher
 
       - name: Build app (Windows)
         if: matrix.target == 'windows-x86_64'
@@ -127,19 +127,19 @@ jobs:
             $BINS --distpath pyinst_dist tools/gui.py
           cp wit-gpl-2.0.txt pyinst_dist/MarioPowerTennis-Patcher/
           cd pyinst_dist
-          7z a "../Mario-Power-Tennis-Patch-${{ matrix.target }}.zip" MarioPowerTennis-Patcher \
-            || powershell -Command "Compress-Archive -Path MarioPowerTennis-Patcher -DestinationPath ../Mario-Power-Tennis-Patch-${{ matrix.target }}.zip"
+          7z a "../Mario-Power-Tennis-ISO-Patcher-${{ matrix.target }}.zip" MarioPowerTennis-Patcher \
+            || powershell -Command "Compress-Archive -Path MarioPowerTennis-Patcher -DestinationPath ../Mario-Power-Tennis-ISO-Patcher-${{ matrix.target }}.zip"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Mario-Power-Tennis-Patch-${{ matrix.target }}
-          path: Mario-Power-Tennis-Patch-${{ matrix.target }}.*
+          name: Mario-Power-Tennis-ISO-Patcher-${{ matrix.target }}
+          path: Mario-Power-Tennis-ISO-Patcher-${{ matrix.target }}.*
 
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: Mario-Power-Tennis-Patch-${{ matrix.target }}.*
+          files: Mario-Power-Tennis-ISO-Patcher-${{ matrix.target }}.*
 
   patch-files:
     needs: check
