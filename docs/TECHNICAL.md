@@ -97,9 +97,13 @@ over Dolphin's GDB stub. Dolphin answers a break with `T05`, an empty packet and
 `tennis.rso` loads at a different address on each boot; find it by searching
 RAM for a known function's bytes.
 
-Verified in Dolphin: with only a GameCube pad and no Wii Remote, the game boots,
-the menus work, a match starts, and the player moves, serves and returns with the
-GameCube controls. The same works with a Classic Controller. Not yet tested on a
+Verified in Dolphin on the USA, European and Japanese releases: with only a
+GameCube pad and no Wii Remote, the game boots, the menus work, a match starts,
+and the player moves, serves and returns with the GameCube controls (player mode
+0, buttons and stick reaching the player). The same works with a Classic
+Controller, and with both patches applied together. The first match opens with
+the Shot Lesson; its "Start the match" prompt is Start on both controllers (the
+game turns the Wii Remote's 1 button into GameCube Start). Not yet tested on a
 console.
 
 ## Sites by release

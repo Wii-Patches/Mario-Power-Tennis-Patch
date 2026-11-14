@@ -36,7 +36,7 @@ In matches both controllers use the original GameCube game's controls.
 | A + B | Flat shot |
 | A then B / B then A | Lob / drop shot |
 | Other buttons | As in the GameCube game (Power Shots and the rest) |
-| Start | Pause |
+| Start | Pause · start the match from the Shot Lesson |
 | C stick | Menu pointer, while you move it |
 
 ### Classic Controller
@@ -104,7 +104,7 @@ it for you.
 - The menus are driven by the stick (and the pointer while the C stick / right
   stick moves); they cannot be navigated with the D-pad of the GameCube pad.
 - The Classic Controller plugs into a Wii Remote, so that patch needs one.
-- Tested in Dolphin; not yet tested on a console.
+- Tested in Dolphin with all three releases; not yet tested on a console.
 
 ## Repository layout
 
