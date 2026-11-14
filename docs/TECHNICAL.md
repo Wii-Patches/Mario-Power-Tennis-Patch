@@ -110,9 +110,10 @@ A, B, A+B, A then B and B then A all return the ball, and each leaves a
 different swing state in the player record. Buttons pressed together arrive
 together: A+B reads `0x6300` in the game's GameCube pad data in the same frame,
 and A+B+R reaches the player as `0x6320`. What each combination then does,
-including the Power Shots, is the game's own GameCube code. No Power Shot was
-seen in the automated runs (the gauge never filled), so that is still worth a
-check by hand. The first match opens with
+including the Power Shots, is the game's own GameCube code. With the gauge
+full (10000, at player offset `0x32c`), a Y press as the ball came in played
+Mario's full Power Shot: close-up, charge and smash, after which the gauge
+dropped to about half. The first match opens with
 the Shot Lesson; its "Start the match" prompt is Start on both controllers (the
 game turns the Wii Remote's 1 button into GameCube Start). Not yet tested on a
 console.
