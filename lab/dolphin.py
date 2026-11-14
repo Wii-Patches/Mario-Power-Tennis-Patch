@@ -1,4 +1,4 @@
-"""Run a patched Mario Sports Mix image in a private Dolphin and read it back.
+"""Run a patched Mario Power Tennis image in a private Dolphin and read it back.
 
 A throwaway Dolphin user folder (config, saves, pipes) is built per run, so
 every run starts from the same state.  Input goes in through Dolphin's Pipe

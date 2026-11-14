@@ -12,15 +12,19 @@
 # sample + 0x37 is the marker byte (bit 0 = "Classic Controller pointer"); it is
 # the last byte of the 0x38-byte ring slot and nothing else uses it.
 #
-#   Classic Controller            Wii Remote / Nunchuk
-#   A  B                          A  B
-#   X                             C   (dismiss / lie down)
-#   Y  -                          -   (switch leaders)
-#   ZL                            Z   (camera)
-#   L  R                          1  2   (the two sprays)
-#   ZR                            D-pad down (swarm)
-#   D-pad                         D-pad
-#   +  HOME                       +  HOME
+# The buttons are chosen so that the game's own Wii Remote -> GameCube pad
+# conversion (which the GameCube control mode in matches reads, see cc_mode.s)
+# turns them into the GameCube game's buttons:
+#
+#   Classic Controller    Wii Remote / Nunchuk    GameCube pad (in a match)
+#   A  B                  A  B                    A  B
+#   X  Y                  2                       Z
+#   +  -                  1                       Start
+#   L  ZL                 -                       L
+#   R  ZR                 +                       R
+#   left stick            Nunchuk stick           control stick
+#   D-pad, HOME           D-pad, HOME
+#   right stick           the pointer (only while it is moved)
     stb     3, 0x36(30)                 # displaced instruction
     li      0, 0
     stb     0, 0x37(30)                 # marker: nothing synthetic yet
@@ -37,17 +41,17 @@
     lha     10, 0x30(30)                # right stick X
     lha     11, 0x32(30)                # right stick Y
     li      7, 0
-    mapbit  CC_A,      WM_A
-    mapbit  CC_B,      WM_B
-    mapbit  CC_X,      WM_C
-    mapbit  CC_Y,      WM_MINUS
-    mapbit  CC_MINUS,  WM_MINUS
-    mapbit  CC_PLUS,   WM_PLUS
+    mapbit  CC_A,      WM_A             # -> GameCube A
+    mapbit  CC_B,      WM_B             # -> GameCube B
+    mapbit  CC_X,      WM_2             # -> GameCube Z
+    mapbit  CC_Y,      WM_2             # -> GameCube Z
+    mapbit  CC_PLUS,   WM_1             # -> GameCube Start (pause)
+    mapbit  CC_MINUS,  WM_1
     mapbit  CC_HOME,   WM_HOME
-    mapbit  CC_ZL,     WM_Z
-    mapbit  CC_L,      WM_Z
-    mapbit  CC_R,      WM_A
-    mapbit  CC_ZR,     WM_B
+    mapbit  CC_L,      WM_MINUS         # -> GameCube L
+    mapbit  CC_ZL,     WM_MINUS
+    mapbit  CC_R,      WM_PLUS          # -> GameCube R
+    mapbit  CC_ZR,     WM_PLUS
     mapbit  CC_UP,     WM_UP
     mapbit  CC_DOWN,   WM_DOWN
     mapbit  CC_LEFT,   WM_LEFT
@@ -78,6 +82,8 @@
     stb     9, 0x31(30)
     sth     10, 0x2a(30)
     sth     11, 0x2c(30)
+    or.     0, 10, 11
+    beq     9f                          # right stick at rest: leave the pointer alone
     li      0, 1
-    stb     0, 0x37(30)
+    stb     0, 0x37(30)                 # marker: pointer from the right stick
 9:

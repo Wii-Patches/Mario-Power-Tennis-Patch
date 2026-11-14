@@ -1,4 +1,4 @@
-# Shared assembler macros for the Pikmin 2 controller patches.
+# Shared assembler macros for the Mario Power Tennis controller patches.
 # Scratch registers used by the macros: r0 and r12.
 
 # r7 |= DST if any SRC bit is set in r5 (the pad's button word)

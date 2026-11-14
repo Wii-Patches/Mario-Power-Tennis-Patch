@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Regenerate tools/prebuilt/*.json from src/ (needs devkitPPC and the retail DOLs).
 
-    P2_DOLS=/path/with/R92E01.dol,R92P01.dol,R92J01.dol  python3 tools/gen_prebuilt.py [cc|gc ...]
+    MPT_DOLS=<dir with RMAE01.dol RMAP01.dol RMAJ01.dol>  python3 tools/gen_prebuilt.py [cc|gc ...]
 
-Each retail DOL can instead be given as P2_DOL_<ID>.  The JSON is what the
+Each retail DOL can instead be given as MPT_DOL_<ID>.  The JSON is what the
 patcher ships and reads; end users do not need devkitPPC or any game files here.
 """
 import json
@@ -19,10 +19,10 @@ from regions import REGIONS
 
 
 def dol_for(region):
-    env = os.environ.get('MPT_DOL_' + region) or os.environ.get('P2_DOL_' + region)
+    env = os.environ.get('MPT_DOL_' + region)
     if env:
         return Dol(env)
-    base = os.environ.get('MPT_DOLS') or os.environ.get('P2_DOLS')
+    base = os.environ.get('MPT_DOLS')
     if base:
         p = os.path.join(base, region + '.dol')
         if os.path.exists(p):

@@ -21,10 +21,10 @@ CREDIT = {
     'gc': 'quatric',
 }
 BLURB = {
-    'cc': ['Play with a Classic Controller plugged into the Wii Remote: left stick moves, right stick aims.',
-           'A topspin, B slice, X/A+B flat, Y lunge, ZL dive, L dive, R/ZR power shots, D-pad menus.'],
-    'gc': ['Play with a GameCube controller in port 1 (no Wii Remote needed), using the',
-           'original GameCube game\'s controls: control stick moves, A topspin, B slice, X flat, L dive, R/Z power shots.'],
+    'cc': ['Play with a Classic Controller plugged into the Wii Remote, using the original',
+           'GameCube game\'s controls in matches: left stick moves, A/B shots, X/Y = Z, L/ZL = L, R/ZR = R, + = Start.'],
+    'gc': ['Play with a GameCube controller (no Wii Remote needed), using the original',
+           'GameCube game\'s controls in matches.'],
 }
 COMBINED_WARNING = []
 

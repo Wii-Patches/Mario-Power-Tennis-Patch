@@ -29,12 +29,12 @@
     li      7, 0
     mapbit  PAD_A,     WM_A
     mapbit  PAD_B,     WM_B
-    mapbit  PAD_X,     WM_C
-    mapbit  PAD_Y,     WM_MINUS
+    mapbit  PAD_X,     WM_1
+    mapbit  PAD_Y,     WM_2
     mapbit  PAD_START, WM_PLUS
+    mapbit  PAD_Z,     WM_MINUS
     mapbit  PAD_L,     WM_Z
-    mapbit  PAD_R,     WM_A
-    mapbit  PAD_Z,     WM_B
+    mapbit  PAD_R,     WM_C
     mapbit  PAD_UP,    WM_UP
     mapbit  PAD_DOWN,  WM_DOWN
     mapbit  PAD_LEFT,  WM_LEFT
@@ -46,10 +46,10 @@
     absr    4, 9
     cmplwi  4, 30
     bge     cstick
-    mr      8, 10                       # pointer = control stick
-    mr      9, 11
+    li      4, 4                        # marker: pad answered, no pointer
     b       ptr_done
 cstick:
+    li      4, 6                        # marker: pad answered, pointer from the C stick
 ptr_done:
     or      6, 6, 7
     sth     6, 0x00(SMP)
@@ -76,6 +76,6 @@ ptr_done:
     sth     8, 0x2a(SMP)
     sth     9, 0x2c(SMP)
     lbz     0, 0x37(SMP)
-    ori     0, 0, 2
-    stb     0, 0x37(SMP)                 # marker bit 1: GameCube pointer
+    or      0, 0, 4
+    stb     0, 0x37(SMP)                 # marker bits: 4 = GameCube pad, 2 = its pointer
 9:

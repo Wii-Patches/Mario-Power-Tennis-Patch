@@ -1,4 +1,4 @@
-"""Build the Classic Controller feature for one region from src/cc_sample.s, src/pointer.s, and src/swing.s."""
+"""Build the Classic Controller feature for one region (src/cc_*.s, src/pointer.s)."""
 import os
 import sys
 
@@ -28,9 +28,9 @@ def build(region, dol):
                      'KPAD read loop: pointer from the right stick')
     ops.append(h)
     cur += size
-    in_buf = g.INPUT_BUF[region]
-    h, size = g.hook(at['cc_swing'], w['cc_swing'], cur, g.read('cc_swing.s'), {'INPUT_BUF': in_buf}, consts,
-                     'Racquet update: button presses trigger tennis swing')
+    ex, ew = g.cc_extra_sites(region, dol)
+    h, size = g.hook(ex['kpad_ret'], ew['kpad_ret'], cur, g.read('cc_mode.s'), {'PROBE': ex['probe']}, consts,
+                     'getKPADStatus: a player with a Classic Controller gets the original GameCube controls')
     ops.append(h)
     cur += size
     if cur > CC_END:

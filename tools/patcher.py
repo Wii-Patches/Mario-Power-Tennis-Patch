@@ -66,7 +66,7 @@ def patch_file(src, dst, region, which):
 
 if __name__ == '__main__':
     import argparse
-    ap = argparse.ArgumentParser(description='Patch a Pikmin 2 main.dol')
+    ap = argparse.ArgumentParser(description='Patch a Mario Power Tennis main.dol')
     ap.add_argument('src')
     ap.add_argument('dst')
     ap.add_argument('--region', choices=sorted(REGIONS), help='default: detect')

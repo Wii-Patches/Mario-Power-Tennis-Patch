@@ -1,4 +1,4 @@
-"""Build the GameCube controller feature for one region from src/gc_sample.s, src/pointer.s, src/gc_synth.s, src/gc_probe.s, and src/swing.s."""
+"""Build the GameCube controller feature for one region (src/gc_*.s, src/pointer.s)."""
 import os
 import sys
 
@@ -37,11 +37,17 @@ def build(region, dol):
                      'WPADProbe: a GameCube pad counts as a connected controller')
     ops.append(h)
     cur += size
-    in_buf = g.INPUT_BUF[region]
-    target_eval = g.decode_branch(w['gc_swing'], at['gc_swing'])
-    h, size = g.hook(at['gc_swing'], w['gc_swing'], cur, g.read('gc_swing.s'),
-                     {'INPUT_BUF': in_buf, 'SWING_EVAL': target_eval}, consts,
-                     'Racquet update: button presses trigger tennis swing')
+    h, size = g.hook(ex['info'], ew['info'], cur, g.read('gc_info.s'),
+                     {'WPAD_CB': g.wpad_control_blocks(dol, ex['info'])}, consts,
+                     'WPADGetInfo: answer for the GameCube pad instead of waiting on a remote that is not there')
+    ops.append(h)
+    cur += size
+    h, size = g.hook(ex['kpad'], ew['kpad'], cur, g.read('gc_mode.s'), {}, consts,
+                     'getKPADStatus: a player with a GameCube pad gets the original GameCube controls')
+    ops.append(h)
+    cur += size
+    h, size = g.hook(ex['pad'], ew['pad'], cur, g.read('gc_pad.s'), {}, consts,
+                     'controller update: the GameCube pad itself fills its channel\'s PADStatus')
     ops.append(h)
     cur += size
     if cur > GC_END:

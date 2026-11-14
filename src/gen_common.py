@@ -1,9 +1,9 @@
 """Shared pieces of the Classic Controller and GameCube controller builders.
 
-Both patches work on the KPAD library's per-channel sample (a WPADStatus in
-a ring buffer): they rewrite it into the Wii Remote + Nunchuk sample the game
-was written for, and then give KPAD's output a pointer when the controller
-has no IR.
+Both patches rewrite the controller into the Wii Remote + Nunchuk sample KPAD
+expects (so the menus work), and in matches switch the player to the game's
+dormant GameCube control mode, which reads the GameCube pad data the port still
+builds every frame.  See docs/TECHNICAL.md.
 """
 import os
 import struct
@@ -19,17 +19,12 @@ SAMPLE_STB = 0x800A6884          # stb r3,0x36(r30)   data format stored
 SAMPLE_ADDI = 0x800A6888         # addi r0,r28,1      next instruction
 POINTER_BL = 0x800A6478          # bl <per-sample IR/geometry>
 POINTER_B = 0x800A647C           # b  <end of the sample's iteration>
-CC_SWING = 0x80015DC0          # cmpwi r0,0         racquet update swing check
-GC_SWING = 0x80015DC8          # bl <eval>          racquet update swing eval call
 
 PROBE_ENTRY = 0x800990B8         # WPADProbe, first instruction (stwu r1,-0x10(r1))
 RING_COUNT = 0x800A5EC4          # lbz r0,0x10f(r31)  KPAD read: samples waiting in the ring
-
-INPUT_BUF = {
-    'RMAE01': 0x80313510,
-    'RMAP01': 0x80313510,
-    'RMAJ01': 0x802FDB10,
-}
+GETINFO_ENTRY = 0x80099378       # WPADGetInfo, first instruction (stwu r1,-0x10(r1))
+GETKPAD_ENTRY = 0x800361B0       # getKPADStatus, first instruction (clrlwi r0,r3,30)
+PADCLAMP_ARG = 0x8000E228        # addi r3,r1,8   just before the per-frame bl PADClamp
 
 USA_DOL = None
 
@@ -69,19 +64,13 @@ def sites(region, dol):
     usa = USA_DOL if region != 'RMAE01' else dol
     out = {}
     for key, (addr, before, after) in dict(stb=(SAMPLE_STB, 12, 6), addi=(SAMPLE_ADDI, 12, 6),
-                                           bl=(POINTER_BL, 12, 6), b=(POINTER_B, 12, 6),
-                                           cc_swing=(CC_SWING, 8, 8),
-                                           gc_swing=(GC_SWING, 8, 8)).items():
+                                           bl=(POINTER_BL, 12, 6), b=(POINTER_B, 12, 6)).items():
         out[key] = addr if region == 'RMAE01' else find_unique(usa, dol, addr, before, after)
     w = {k: struct.unpack('>I', dol.read(a, 4))[0] for k, a in out.items()}
     if w['stb'] != 0x987E0036 or w['addi'] != 0x381C0001:
         raise SystemExit('%s: sample hook sites are 0x%08X 0x%08X' % (region, w['stb'], w['addi']))
     if (w['bl'] >> 26) != 18 or not w['bl'] & 1 or (w['b'] >> 26) != 18 or w['b'] & 1:
         raise SystemExit('%s: pointer hook sites are not bl / b' % region)
-    if w['cc_swing'] != 0x2C000000:
-        raise SystemExit('%s: cc swing hook site is not cmpwi r0,0 (got 0x%08X)' % (region, w['cc_swing']))
-    if (w['gc_swing'] >> 26) != 18 or not w['gc_swing'] & 1:
-        raise SystemExit('%s: gc swing hook site is not bl (got 0x%08X)' % (region, w['gc_swing']))
     return out, w
 
 
@@ -99,9 +88,55 @@ def gc_extra_sites(region, dol):
     """Sites only the GameCube patch needs (it also works without a Wii Remote)."""
     usa = USA_DOL if region != 'RMAE01' else dol
     out = {}
-    for key, (addr, before, after) in dict(probe=(PROBE_ENTRY, 0, 14), ring=(RING_COUNT, 12, 6)).items():
+    for key, (addr, before, after) in dict(probe=(PROBE_ENTRY, 0, 14), ring=(RING_COUNT, 12, 6),
+                                           info=(GETINFO_ENTRY, 0, 24),
+                                           pad=(PADCLAMP_ARG, 16, 8)).items():
         out[key] = addr if region == 'RMAE01' else find_unique(usa, dol, addr, before, after)
+    out['kpad'] = find_getkpad(dol)
     w = {k: struct.unpack('>I', dol.read(a, 4))[0] for k, a in out.items()}
-    if w['probe'] != 0x9421FFF0 or w['ring'] != 0x881F010F:
-        raise SystemExit('%s: probe / ring sites are 0x%08X 0x%08X' % (region, w['probe'], w['ring']))
+    want = dict(probe=0x9421FFF0, ring=0x881F010F, info=0x9421FFF0, kpad=0x546007BE, pad=0x38610008)
+    for k, v in want.items():
+        if w[k] != v:
+            raise SystemExit('%s: %s site is 0x%08X, expected 0x%08X' % (region, k, w[k], v))
     return out, w
+
+
+def wpad_control_blocks(dol, getinfo):
+    """The address of WPAD's per-channel control block pointer table, from the
+    `lis r3,hi ; ... ; addi r3,r3,lo` pair WPADGetInfo uses to load it."""
+    lis, addi = (struct.unpack('>I', dol.read(getinfo + o, 4))[0] for o in (0x2c, 0x34))
+    if lis >> 16 != 0x3C60 or addi >> 16 != 0x3863:
+        raise SystemExit('WPADGetInfo does not load the control block table where expected')
+    lo = addi & 0xFFFF
+    return ((lis & 0xFFFF) << 16) + (lo - 0x10000 if lo & 0x8000 else lo)
+
+
+def find_getkpad(dol):
+    """getKPADStatus(chan): `clrlwi r0,r3,30 ; lis r3,hi ; mulli r0,r0,0x84 ; addi r3,r3,lo ;
+    add r3,r3,r0 ; blr`.  getKPADStatusRep has the same shape and follows it directly, so
+    the first of two back-to-back matches is the one."""
+    hits = []
+    for off, base, size, idx in dol.secs:
+        if idx >= 7:
+            continue
+        t = bytes(dol.data[off:off + size])
+        for i in range(0, size - 24, 4):
+            w = struct.unpack('>6I', t[i:i + 24])
+            if (w[0] == 0x546007BE and w[1] >> 16 == 0x3C60 and w[2] == 0x1C000084 and w[3] >> 16 == 0x3863
+                    and w[4] == 0x7C630214 and w[5] == 0x4E800020):
+                hits.append(base + i)
+    pairs = [a for a in hits if a + 0x18 in hits]
+    if len(pairs) != 1:
+        raise SystemExit('getKPADStatus: %d candidates' % len(pairs))
+    return pairs[0]
+
+
+def cc_extra_sites(region, dol):
+    """Sites only the Classic Controller patch needs."""
+    usa = USA_DOL if region != 'RMAE01' else dol
+    kpad = find_getkpad(dol)
+    probe = PROBE_ENTRY if region == 'RMAE01' else find_unique(usa, dol, PROBE_ENTRY, 0, 14)
+    words = struct.unpack('>6I', dol.read(kpad, 24))
+    if words[0] != 0x546007BE or words[2] != 0x1C000084 or words[4] != 0x7C630214 or words[5] != 0x4E800020:
+        raise SystemExit('%s: getKPADStatus is not where expected' % region)
+    return dict(kpad_ret=kpad + 20, probe=probe), dict(kpad_ret=words[5])

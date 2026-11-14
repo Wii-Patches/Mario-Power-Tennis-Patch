@@ -7,21 +7,19 @@
 # 12*n, +4): INBUFH [31] error, [23] a real pad's answer, [29:16] buttons,
 # [15:8] stick X, [7:0] stick Y; INBUFL cstick X, cstick Y, L, R.
 #
-# The layout follows the original GameCube game's controls, expressed as the
-# New Play Control inputs that do the same thing:
+# This sample is what KPAD (and so the menus) sees: the control stick is the
+# Nunchuk stick, and the buttons map to the Wii Remote buttons the menus use:
 #
-#   Control stick   move; the pointer follows it (the cursor sits where the stick points)
-#   C stick         swarm: D-pad down held, the pointer follows the C stick
 #   A  B            A  B
-#   X               C   (dismiss / lie down)
-#   Y               -   (switch leaders)
-#   L               Z   (camera forward / rotate)
-#   R               D-pad right (camera distance / ground-level angle)
-#   Z               D-pad up    (camera vertical angle)
+#   X  Y            1  2
 #   Start           +
-#   D-pad           while A is held (carrying a Pikmin): left/right = B (swap type),
-#                   up/down = D-pad down (swap maturity);
-#                   otherwise up = 1 (bitter spray), down = 2 (spicy spray)
+#   Z               -
+#   L  R            Z  C
+#   D-pad           D-pad
+#   C stick         the pointer (only while it is moved)
+#
+# In a match the player is switched to the game's GameCube controls instead
+# (gc_mode.s, gc_pad.s), which read the pad directly.
     .set    CHAN, 29
     .set    SMP, 30
 #include gc_convert.s

@@ -13,49 +13,46 @@ Dolphin. Nothing from the game is included in this repository.
 
 ## How it works, in one paragraph
 
-The game was written for a Wii Remote with a Nunchuk and motion swings. The patches rewrite
-whatever controller you are holding into a Wii Remote + Nunchuk sample — right where the Wii's
-`KPAD` library reads its samples — so the game runs its ordinary Nunchuk movement and menu code.
-In addition, racket swings and shot types (Topspin, Slice, Flat, Lob, Drop, Power Shots) are
-driven directly by button presses (A, B, X/C, L, R, Z), reproducing the controls of the original
-GameCube classic. See [docs/TECHNICAL.md](docs/TECHNICAL.md) for the details.
+The Wii version is the GameCube game with Wii Remote controls added on top, and
+the GameCube controls are still inside it: every frame the game still builds
+GameCube pad data, and the match code still has the GameCube control mode, which
+the Wii release can never select. The patches put the real controller into that
+pad data and switch your player to the GameCube mode. Shots, Power Shots, lunges
+and dives are then handled by the game's own GameCube code, so it plays like the
+original. The menus get the controller as a Wii Remote + Nunchuk. See
+[docs/TECHNICAL.md](docs/TECHNICAL.md) for the details.
 
 ## Controls
 
-### GameCube controller (port 1)
+In matches both controllers use the original GameCube game's controls.
 
-The layout follows the original GameCube game.
+### GameCube controller
 
 | Input | Action |
 | --- | --- |
-| Control stick | Move player on court · menu navigation |
-| C stick | Menu cursor / pointer |
-| A | Topspin swing · toss ball on serve · confirm in menus |
-| B | Slice swing · cancel in menus |
-| X / A+B | Flat shot |
-| Y | Lunge |
-| L | Dive / manual reach |
-| R | Offensive Power Shot (when meter is charged) |
-| Z | Defensive Power Shot (when meter is charged) |
+| Control stick | Move · aim · menu navigation |
+| A | Topspin · serve · confirm in menus |
+| B | Slice · back in menus |
+| A + B | Flat shot |
+| A then B / B then A | Lob / drop shot |
+| Other buttons | As in the GameCube game (Power Shots and the rest) |
 | Start | Pause |
-| D-pad | Menu navigation |
+| C stick | Menu pointer, while you move it |
 
 ### Classic Controller
 
-| Input | Action |
+The buttons arrive in the game as GameCube buttons:
+
+| Classic Controller | GameCube button |
 | --- | --- |
-| Left stick | Move player on court |
-| Right stick | Menu cursor / pointer |
-| A | Topspin swing · toss ball on serve · confirm in menus |
-| B | Slice swing · cancel in menus |
-| X | Flat shot |
-| Y | Lunge |
-| ZL / L | Dive / manual reach |
-| R / ZR | Offensive / Defensive Power Shots |
-| + | Pause |
-| − | Lunge / toggle manual mode |
+| Left stick, D-pad | Control stick |
+| A, B | A, B |
+| X, Y | Z |
+| L, ZL | L |
+| R, ZR | R |
+| +, − | Start |
+| Right stick | Menu pointer, while you move it |
 | HOME | HOME Menu |
-| D-pad | Menu navigation |
 
 With a Classic Controller on a Wii U (vWii) injection, enable *Force Classic
 Controller Connected*.
@@ -82,20 +79,13 @@ There is a command-line twin:
 python3 tools/patch_disc.py "Mario Power Tennis (USA) (En,Fr,Es).wbfs" --cc --gc
 ```
 
-### Gecko codes (Dolphin)
+### Riivolution and Gecko codes
 
-Copy `codes/<disc id>.ini` (`RMAE01`, `RMAP01` or `RMAJ01`) into Dolphin's
-`GameSettings` folder and enable the codes under **Properties → Gecko Codes**.
-The two codes are independent. Set GameCube Port 1 to a Standard Controller
-(for the GameCube patch). A Wii Remote is optional for the GameCube patch.
-
-The same codes are in `codes/<disc id>.txt` in the plain layout loaders read.
-
-### Riivolution
-
-`riivolution/<disc id>.xml` is a Riivolution patch with one switch per feature.
-Put it in your Riivolution folder (or Dolphin's `Load/Riivolution`) and enable
-the options you want.
+`riivolution/<disc id>.xml` is a Riivolution patch with one switch per feature,
+generated from the same data; put it in your Riivolution folder (or Dolphin's
+`Load/Riivolution`). `codes/` has the same patches as Gecko code lists, kept for
+reference only: their routines go where Dolphin and USB loaders put their own
+code handler, so they do not boot. Patching the disc is the recommended install.
 
 ### Which release do I have?
 
@@ -105,15 +95,16 @@ it for you.
 
 ## Limits
 
-- The GameCube controller works with **no Wii Remote connected at all**; with one
-  connected, the remote's own buttons still work alongside the pad. GameCube
-  port 1 drives player 1.
+- The GameCube controller works with **no Wii Remote connected at all**. GameCube
+  port 1 is player 1 (port *n* is player *n*, but only port 1 has been tested).
 - Without a Wii Remote there is no HOME button (the HOME Menu belongs to the
   remote) and no rumble.
 - Plug the GameCube controller in **before** starting the game; hot-plugging is
   not handled.
-- While a patched controller is in use, the cursor follows the stick on menus.
-- The Classic Controller still plugs into a Wii Remote, so that patch needs one.
+- The menus are driven by the stick (and the pointer while the C stick / right
+  stick moves); they cannot be navigated with the D-pad of the GameCube pad.
+- The Classic Controller plugs into a Wii Remote, so that patch needs one.
+- Tested in Dolphin; not yet tested on a console.
 
 ## Repository layout
 

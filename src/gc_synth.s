@@ -40,7 +40,7 @@ slot:
     .set    SMP, 3
 #include gc_convert.s
     lbz     0, 0x37(3)
-    andi.   0, 0, 2
+    andi.   0, 0, 4
     beq     9f                          # no pad answered: nothing to add
     lbz     5, 0x10e(31)
     cmplwi  5, 16

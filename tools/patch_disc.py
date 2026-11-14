@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Command-line twin of the GUI: patch a .wbfs/.iso in place.
 
-    python3 tools/patch_disc.py "Pikmin 2 (USA) (En,Fr,Es).wbfs" --cc --gc
+    python3 tools/patch_disc.py "Mario Power Tennis (USA) (En,Fr,Es).wbfs" --cc --gc
 """
 import argparse
 import os

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the patch data against real, retail main.dol files.
 
-    P2_DOLS=<dir with R92E01.dol R92P01.dol R92J01.dol> python3 tools/verify.py
+    MPT_DOLS=<dir with RMAE01.dol RMAP01.dol RMAJ01.dol> python3 tools/verify.py
 
 For every region and every combination of the two patches:
   * every site holds the retail bytes before patching
@@ -34,7 +34,7 @@ def check(cond, msg):
 
 
 def retail(region):
-    base = os.environ.get('MPT_DOLS') or os.environ.get('P2_DOLS')
+    base = os.environ.get('MPT_DOLS')
     if base:
         p = os.path.join(base, region + '.dol')
         if os.path.exists(p):

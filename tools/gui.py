@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Drag-and-drop patcher: drop a Pikmin 2 disc image on the window, done.
+"""Drag-and-drop patcher: drop a Mario Power Tennis disc image on the window, done.
 
 Extracts the disc, patches its own main.dol for the options you tick, and
 rebuilds the image in the same format.  The rebuilt image replaces the original
