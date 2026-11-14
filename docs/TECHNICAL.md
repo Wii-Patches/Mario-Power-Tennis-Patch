@@ -106,9 +106,11 @@ checked on the USA release with four GameCube pads, four Classic Controllers,
 and a Classic Controller for player 1 with GameCube pads on ports 2-4: every
 player is human-controlled in mode 0 on its own channel, and each port's buttons
 and stick reach only its own player. In singles rallies against the computer,
-A, B, A+B, A then B and B then A all return the ball. Which shot each one makes,
-and the Power Shots, come from the game's own GameCube code and were not checked
-one by one. The first match opens with
+A, B, A+B, A then B and B then A all return the ball, and A, B, A then B and
+B then A each select a different shot type in the player state (offset `0x1a0`
+of the player record: 1, 4, 2, 3). A+B could not be told apart from A in these
+automated runs, and no Power Shot was triggered (the gauge never filled during
+them); both are the game's own GameCube code and still need a check by hand. The first match opens with
 the Shot Lesson; its "Start the match" prompt is Start on both controllers (the
 game turns the Wii Remote's 1 button into GameCube Start). Not yet tested on a
 console.
