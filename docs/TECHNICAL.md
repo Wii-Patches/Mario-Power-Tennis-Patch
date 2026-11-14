@@ -101,7 +101,14 @@ Verified in Dolphin on the USA, European and Japanese releases: with only a
 GameCube pad and no Wii Remote, the game boots, the menus work, a match starts,
 and the player moves, serves and returns with the GameCube controls (player mode
 0, buttons and stick reaching the player). The same works with a Classic
-Controller, and with both patches applied together. The first match opens with
+Controller, and with both patches applied together. Four-player doubles were
+checked on the USA release with four GameCube pads, four Classic Controllers,
+and a Classic Controller for player 1 with GameCube pads on ports 2-4: every
+player is human-controlled in mode 0 on its own channel, and each port's buttons
+and stick reach only its own player. In singles rallies against the computer,
+A, B, A+B, A then B and B then A all return the ball. Which shot each one makes,
+and the Power Shots, come from the game's own GameCube code and were not checked
+one by one. The first match opens with
 the Shot Lesson; its "Start the match" prompt is Start on both controllers (the
 game turns the Wii Remote's 1 button into GameCube Start). Not yet tested on a
 console.

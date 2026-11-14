@@ -96,7 +96,8 @@ it for you.
 ## Limits
 
 - The GameCube controller works with **no Wii Remote connected at all**. GameCube
-  port 1 is player 1 (port *n* is player *n*, but only port 1 has been tested).
+  port *n* is player *n*; four-player matches work with GameCube controllers,
+  Classic Controllers, or a mix of both.
 - Without a Wii Remote there is no HOME button (the HOME Menu belongs to the
   remote) and no rumble.
 - Plug the GameCube controller in **before** starting the game; hot-plugging is
